@@ -1,4 +1,5 @@
 <?php 
+//TODO:警报邮件发送数量限制
 use Workerman\Worker;
 use think\Db;
 require_once __DIR__ . '/vendor/autoload.php';
