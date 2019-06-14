@@ -57,9 +57,9 @@ function chenpay_alipay_link($params) {
 		   exit('订单添加错误：'.$GetInfo['msg']);
 	   }
 	   $userdata = array();
-	   include __DIR__ . "/chenpay_alipay/phpqrcode.php";
 	   $userdata['qrcode'] = $params['payqr'];
 	   $userdata['money'] = $params['amount'];
+	   $userdata['invoiceid'] = $params['invoiceid'];
 	   $userdata['remarks'] = $RandomString.$params['invoiceid'];
 	   $userdata['make_time'] = date('Y-m-d H:i:s',$Nowtime);
 	   $userdata['end_time'] = date('Y-m-d H:i:s',$StopTime);

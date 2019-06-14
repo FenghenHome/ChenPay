@@ -1,4 +1,6 @@
 var myTimer;
+var paid_timer;
+var invoiceid;
 function timer(intDiff) {
     var i = 0;
     myTimer = window.setInterval(function () {
@@ -21,7 +23,6 @@ function timer(intDiff) {
         if (hour <= 0 && minute <= 0 && second <= 0) {
             qrcode_timeout()
             clearInterval(myTimer);
-
         }
         intDiff--;
     }, 1000);
@@ -38,16 +39,33 @@ try {
 qrcode_timeout = function () { //二维码超时则停止显示二维码
     $("#show_qrcode").attr("src", '');
     $("#show_qrcode").attr("alt", '二维码失效');
-
-    $("#msg h1").html("支付超时 请重新提交订单"); //过期提醒信息
+    $("#msg h1").html("支付超时,请重新提交订单.如已支付,请等待支付到帐通知"); //过期提醒信息
+	//clearInterval(paid_timer);
 }
 show_Qrcode = function (data) {
     if (!data)return;
     if (data.qrcode)$("#show_qrcode").attr("src", data.qrcode);
     if (data.money) $("#money").html('￥' + data.money);
     var tps='到帐可能会有几分钟延迟 <br><span style="color:red">为了您及时到账 请务必付款'+data.money+'元并在备注注明"'+data.remarks+'"</span><br>';
+	invoiceid = data.invoiceid;
     $("#msg h1").html(tps);
     show_desc(data);
+	paid_timer = setInterval(function(){
+		$.ajax({
+			type: "get",
+			url : "modules/gateways/chenpay_alipay/invoice_status.php",
+			data: {
+                  invoiceid: invoiceid
+            },
+			dataType : "json",
+			success: function(data){
+				if (data.status == 200){
+					clearInterval(paid_timer)
+					alert("支付成功,本页面将在3秒后刷新到账单页面")
+					setTimeout(function(){location.reload()},3000)
+				}
+			}})
+	},1500)
 }
 function getDescMode(key, value) {
     var reslut = value ? '<dt>' + key + '</dt><dd>' + value + '</dd>' : '';

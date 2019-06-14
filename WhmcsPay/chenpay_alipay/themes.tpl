@@ -89,28 +89,5 @@
         $('#use').hide() //2秒后隐藏中间那LOGO
     }, user_data.logoShowTime || 2000);
 </script>
-<script>
-jQuery(document).ready(function() {
-	var paid_status = false
-	var paid_timer = setInterval(function(){
-		$.ajax({
-			type: "get",
-			url : window.location.href,
-			data: {
-                  getstatus: 'yes'
-            },
-			dataType : "text",
-			success: function(data){
-			    //模板不同需要修改status-paid为客户模板的支付成功class
-				if ( data.indexOf('class="'+"status-paid"+'"') != -1)
-				{
-					clearInterval(paid_timer)
-					alert("支付成功,本页面将在3秒后刷新到账单页面")
-					setTimeout(function(){location.reload()},3000)
-				}
-			}})
-	},1500)
-})
-</script>
 </body>
 </html>
