@@ -5,10 +5,6 @@ use think\Db;
 require_once __DIR__ . '/vendor/autoload.php';
 $GLOBALS['endtime'] = 10;
 $GLOBALS['aliSum'] = 1;
-// 支付宝接口切换
-$GLOBALS['aliType'] = true;
-// 暂停 有订单情况下才是10秒一次的频率 杜绝支付宝风控
-$GLOBALS['aliStatus'] = time();
 function curl_post_https($url,$data){ 
     $url = preg_replace('/([^:])[\/\\\\]{2,}/','$1/',$url);
 	$urlfields = "";
@@ -32,9 +28,8 @@ $worker->onWorkerStart = function($worker)
     \Workerman\Lib\Timer::add(30, function(){
 		$data = Db::table('payinfo')->where('pay_way','alipay')->select();
 		include __DIR__.'/config.php';
-        if ($GLOBALS['aliStatus'] > time() && count($data) == 0) return;
         try {
-            $run = (new ChenPay\AliPay($aliCookie))->getData($GLOBALS['aliType'])->DataHandle();
+            $run = (new ChenPay\AliPay($aliCookie))->getData()->DataHandle();
             foreach ($data as $item) {
                 $order = $run->DataContrast($item['fee'], $item['time'], $GLOBALS['endtime'], $item['remarks']);
                 if ($order){
@@ -49,9 +44,7 @@ $worker->onWorkerStart = function($worker)
 	    		}
                 unset($order, $item);
             }
-            $GLOBALS['aliType'] = !$GLOBALS['aliType'];
             $GLOBALS['aliSum']++;
-            $GLOBALS['aliStatus'] = time() + 2 * 60;
         } catch (\ChenPay\PayException\PayException $e) {
 			//错误处理
 		    $ErrorMsg = '['.date("Y-m-d H:i:sa").'] Error: '.$e->getMessage().PHP_EOL;
