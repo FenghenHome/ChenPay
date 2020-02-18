@@ -1,6 +1,6 @@
 {
     "require": {
-        "chen-see/chen-pay": "^1.2",
+        "chen-see/chen-pay": "^1.5",
         "workerman/workerman": "^3.5",
 		"phpmailer/phpmailer": "^6.0",
         "topthink/think-orm": "^1.2"
